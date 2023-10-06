@@ -1,5 +1,6 @@
 import socket
 import datetime
+import time
 
 serverSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
@@ -10,12 +11,14 @@ serverSocket.listen(1)
 print(f"Сервер прослуховує на {host}:{port}")
 clientSocket, clientAddress = serverSocket.accept()
 print(f"З'єднано з {clientAddress}")
-dataFromClient = clientSocket.recv(1024)
-if dataFromClient:
-    current_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    print(f"Отримано від клієнта повідомлення {dataFromClient.decode('utf-8')} ({current_time})")
-response = "Повідомлення отримано!"
-clientSocket.send(response.encode('utf-8'))
+while True:
+    dataFromClient = clientSocket.recv(1024)
+    if not dataFromClient:
+        break
+    time.sleep(5)
+    if dataFromClient.endswith(b'\n'):
+        currentTime = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        print(f"Отримано від клієнта повідомлення {dataFromClient.decode('utf-8')} ({currentTime})")
 
 clientSocket.close()
 serverSocket.close()
